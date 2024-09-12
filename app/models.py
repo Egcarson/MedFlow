@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, Date
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, Date, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
@@ -10,7 +10,8 @@ from app.database import Base
 class Patient(Base):
     __tablename__ = "patients"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True,
+                autoincrement=True, nullable=False)
     title = Column(String, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
@@ -36,7 +37,8 @@ class Patient(Base):
 class Doctor(Base):
     __tablename__ = "doctors"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True,
+                autoincrement=True, nullable=False)
     title = Column(String, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
@@ -62,8 +64,10 @@ class Doctor(Base):
 class Appointment(Base):
     __tablename__ = 'appointments'
 
-    id = Column(Integer, primary_key=True)
-    reason = Column(String(255), nullable=False)
+    id = Column(Integer, primary_key=True, index=True,
+                autoincrement=True, nullable=False)
+    diagnosis = Column(Text(255), nullable=False)
+    severity = Column(String(10), nullable=False)
     patient_id = Column(Integer, ForeignKey(
         "patients.id", ondelete="CASCADE"), nullable=False)
     doctor_id = Column(Integer, ForeignKey(
@@ -82,7 +86,8 @@ class Appointment(Base):
 class EMR(Base):
     __tablename__ = 'emrs'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True,
+                autoincrement=True, nullable=False)
     patient_id = Column(Integer, ForeignKey(
         "patients.id", ondelete="CASCADE"), nullable=False)
 

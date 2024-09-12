@@ -38,6 +38,9 @@ class Patient(PatientBase):
     id: int
     is_active: bool = True
 
+    class Config:
+        from_attributes = True
+
 # Doctor schema definition
 class DoctorBase(BaseModel):
     title: str = "Dr."
@@ -72,7 +75,8 @@ class Doctor(DoctorBase):
 # Appointment schema definition
 class AppointmentBase(BaseModel):
     id: int
-    reason: str
+    diagnosis: str
+    severity: str
     appointment_date: datetime
 
 class AppointmentCreate(AppointmentBase):
@@ -87,6 +91,9 @@ class Appointment(AppointmentBase):
     doctor_id: int
     emr_id: Optional[int] = None
     status: AppointmentStatus = AppointmentStatus.PENDING
+
+    class Config:
+        from_attributes = True
 
 
 
