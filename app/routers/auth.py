@@ -35,7 +35,7 @@ async def create_patient(payload: schema.PatientCreate, db: Session = Depends(ge
 
 
 @auth_router.post('/signup/doctor', status_code=201, response_model=schema.Doctor)
-async def create_patient(payload: schema.DoctorCreate, db: Session = Depends(get_db)):
+async def create_doctor(payload: schema.DoctorCreate, db: Session = Depends(get_db)):
     doctor = doctor_crud_service.get_doctor(db, credential=payload.email)
     if doctor:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
