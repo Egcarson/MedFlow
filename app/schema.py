@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 from enum import Enum
@@ -29,7 +29,7 @@ class PatientBase(BaseModel):
     
 
 class PatientCreate(PatientBase):
-    hashed_password: str
+    password: str
 
 class PatientUpdate(PatientBase):
     pass
@@ -62,7 +62,7 @@ class DoctorBase(BaseModel):
     
 
 class DoctorCreate(DoctorBase):
-    hashed_password: str
+    password: str
 
 class DoctorUpdate(DoctorBase):
     pass
