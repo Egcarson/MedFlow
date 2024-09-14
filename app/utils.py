@@ -1,12 +1,47 @@
-from passlib.context import CryptContext
+import re
+from sqlalchemy.orm import Session
+from crud.doctors import doctor_crud_service
+from crud.patients import patient_crud_service
 
-# Define the password hashing context
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# from passlib.context import CryptContext
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+# # Define the password hashing context
 
-# verify hashed password for user authentication
-def verify_hashed_password(password, hashed_password):
-    return pwd_context.verify(password, hashed_password)
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# def hash_password(password: str):
+#     return pwd_context.hash(password)
+
+# # verify hashed password for user authentication
+# def verify_hashed_password(password, hashed_password):
+#     return pwd_context.verify(password, hashed_password)
+
+
+# For authentication to know whether the user exists as a patient or doctor in database
+def get_user(db: Session, credential: str):
+    user = patient_crud_service.get_patient(db, credential)
+    if not user:
+        user = doctor_crud_service.get_doctor(db, credential)
+    return user
+
+
+# Function to validate password
+
+
+def validate_password(password: str, first_name: str, last_name: str) -> str:
+    if len(password) < 8:
+        return "Password must be at least 8 characters long"
+    if password.lower() == first_name.lower() or password.lower() == last_name.lower() or password.lower() == (first_name + last_name).lower():
+        return "Password cannot be the same as your name"
+    if not re.search(r'[A-Z]', password):
+        return "Password must contain at least one uppercase letter"
+    if not re.search(r'[a-z]', password):
+        return "Password must contain at least one lowercase letter"
+    if not re.search(r'[0-9]', password):
+        return "Password must contain at least one digit"
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return "Password must contain at least one special character"
+    if ' ' in password:
+        return "Password must not contain spaces"
+    return "Password is valid"

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 from enum import Enum
@@ -29,7 +29,7 @@ class PatientBase(BaseModel):
     
 
 class PatientCreate(PatientBase):
-    hashed_password: str
+    password: str
 
 class PatientUpdate(PatientBase):
     pass
@@ -37,6 +37,9 @@ class PatientUpdate(PatientBase):
 class Patient(PatientBase):
     id: int
     is_active: bool = True
+
+    class Config:
+        from_attributes = True
 
 # Doctor schema definition
 class DoctorBase(BaseModel):
@@ -59,7 +62,7 @@ class DoctorBase(BaseModel):
     
 
 class DoctorCreate(DoctorBase):
-    hashed_password: str
+    password: str
 
 class DoctorUpdate(DoctorBase):
     pass
@@ -72,7 +75,8 @@ class Doctor(DoctorBase):
 # Appointment schema definition
 class AppointmentBase(BaseModel):
     id: int
-    reason: str
+    diagnosis: str
+    severity: str
     appointment_date: datetime
 
 class AppointmentCreate(AppointmentBase):
@@ -87,6 +91,9 @@ class Appointment(AppointmentBase):
     doctor_id: int
     emr_id: Optional[int] = None
     status: AppointmentStatus = AppointmentStatus.PENDING
+
+    class Config:
+        from_attributes = True
 
 
 
