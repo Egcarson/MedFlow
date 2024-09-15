@@ -1,7 +1,7 @@
 import re
 from sqlalchemy.orm import Session
-from crud.doctors import doctor_crud_service
-from crud.patients import patient_crud_service
+from app.crud.doctors import doctor_crud_service
+from app.crud.patients import patient_crud_service
 
 
 # from passlib.context import CryptContext
@@ -32,7 +32,7 @@ def get_user(db: Session, credential: str):
 def validate_password(password: str, first_name: str, last_name: str) -> str:
     if len(password) < 8:
         return "Password must be at least 8 characters long"
-    if password.lower() == first_name.lower() or password.lower() == last_name.lower() or password.lower() == (first_name + last_name).lower():
+    if first_name.lower() in password.lower() or last_name.lower() in password.lower():
         return "Password cannot be the same as your name"
     if not re.search(r'[A-Z]', password):
         return "Password must contain at least one uppercase letter"

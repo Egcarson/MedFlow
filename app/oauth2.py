@@ -8,8 +8,8 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
-from utils import get_user
-from database import get_db
+from app.utils import get_user
+from app.database import get_db
 
 load_dotenv()
 
@@ -29,7 +29,7 @@ def verify_password(plain_password, hashed_password):
 
 def authenticate_user(db: Session, credential: str, password: str):
     user = get_user(db, credential=credential)
-    if not user or not verify_password(password, user.hashed_password):
+    if not user or not verify_password(password, user.password):
         return False
     return user
 
@@ -55,7 +55,7 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        if not username:
             raise credentials_exception
     except JWTError:
         raise credentials_exception

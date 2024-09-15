@@ -6,11 +6,9 @@ from sqlalchemy.orm import Session
 class PatientCRUDServices:
 
     @staticmethod
-    def create_patient(db: Session, payload: schema.PatientCreate, hashed_password: str):
-        patient = models.Patient(
-            **payload.model_dump(),
-            hashed_password=hashed_password
-        )
+    def create_patient(db: Session, payload: schema.PatientCreate):
+
+        patient = models.Patient(**payload.model_dump())
 
         db.add(patient)
         db.commit()

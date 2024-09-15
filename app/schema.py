@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 from typing import List
 
@@ -16,7 +16,7 @@ class PatientBase(BaseModel):
     last_name: str = "Doe"
     email: EmailStr
     phone_number: str
-    date_of_birth: datetime
+    date_of_birth: date
     gender: str
     age: Optional[int] = None
     address_line1: str
@@ -45,10 +45,10 @@ class Patient(PatientBase):
 class DoctorBase(BaseModel):
     title: str = "Dr."
     first_name: str = "Henry"
-    last_name: str = "Henry"
+    last_name: str = "Ojeh"
     email: EmailStr
     phone_number: str
-    date_of_birth: datetime
+    date_of_birth: date
     gender: str
     age: Optional[int] = None
     specialization: str = "Surgeon"

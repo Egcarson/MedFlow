@@ -30,8 +30,8 @@ async def create_patient(payload: schema.PatientCreate, db: Session = Depends(ge
         raise HTTPException(status_code=400, detail=password_validation_result)
     
     hashed_password = pwd_context.hash(payload.password)
-
-    return patient_crud_service.create_patient(db=db, payload=payload, hashed_password=hashed_password)
+    payload.password = hashed_password
+    return patient_crud_service.create_patient(db=db, payload=payload)
 
 
 @auth_router.post('/signup/doctor', status_code=201, response_model=schema.Doctor)
@@ -54,8 +54,9 @@ async def create_doctor(payload: schema.DoctorCreate, db: Session = Depends(get_
         raise HTTPException(status_code=400, detail=password_validation_result)
 
     hashed_password = pwd_context.hash(payload.password)
+    payload.password = hashed_password
 
-    return doctor_crud_service.create_doctor(db=db, payload=payload, hashed_password=hashed_password)
+    return doctor_crud_service.create_doctor(db=db, payload=payload)
 
 
 @auth_router.post("/login", status_code=200)
