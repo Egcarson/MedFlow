@@ -25,11 +25,11 @@ class PatientBase(BaseModel):
     state: str = "Lagos"
     zip_code: str
     country: str = "Nigeria"
-    hospital_card_id: str = "MEDFLOW/PAT/24/001"
     
 
 class PatientCreate(PatientBase):
     password: str
+    hospital_card_id: str = "MEDFLOW/PAT/24/001"
 
 class PatientUpdate(PatientBase):
     pass
@@ -102,3 +102,9 @@ class EMR(BaseModel):
     id: int
     patient_id: int
     appointments: List[Appointment]
+
+
+class PasswordReset(BaseModel):
+    email: EmailStr
+    new_password: str
+    confirm_password: str
