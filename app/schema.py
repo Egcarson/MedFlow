@@ -98,7 +98,14 @@ class Appointment(AppointmentBase):
 
 
 # medical record schema definition
-class EMR(BaseModel):
+class EMRBase(BaseModel):
+    hospital_id: int
+    appointments: List[Appointment]
+    
+
+class EMRCreate(EMRBase):
+    appointments: List[Appointment] = None
+
+class EMR(EMRBase):
     id: int
-    patient_id: int
     appointments: List[Appointment]

@@ -21,6 +21,7 @@ class PatientCRUDServices:
     def get_patients(db: Session, offset: int = 0, limit: int = 10):
         return db.query(models.Patient).offset(offset).limit(limit).all()
     
+    
     @staticmethod
     def get_patient_by_email(db: Session, email: str):
         return db.query(models.Patient).filter(models.Patient.email == email).first()

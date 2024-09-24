@@ -40,6 +40,58 @@ class DoctorCRUDServices:
         if not doctor:
             return None
         return doctor
+    
+    @staticmethod
+    def get_all_doctors(db: Session, offset: int = 0, limit: int = 10):
+        return db.query(models.Doctor).offset(offset).limit(limit).all()
+    
+    @staticmethod
+    def get_doctor_by_id(db: Session, doctor_id: int):
+        return db.query(models.Doctor).filter(models.Doctor.id == doctor_id).first()
+    
+    @staticmethod
+    def get_doctor_by_specialization(db: Session, specialization: str, offset: int = 0, limit: int = 10):
+        return db.query(models.Doctor).filter(models.Doctor.specialization == specialization).offset(offset).limit(limit).all()
+    
+    @staticmethod
+    def change_doctor_availability_status(db: Session, doctor_id: int):
+        doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
+        if not doctor:
+            return None
+        if doctor.is_available:
+            doctor.is_available = False
+        else:
+            doctor.is_available = True
+        
+        return doctor
+    
+    @staticmethod
+    def update_doctor(db: Session, payload: schema.DoctorUpdate, doctor_id: int):
+        doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
+        if not doctor:
+            return None
+        
+        payload_dict = payload.model_dump(exclude_unset=True)
+
+        for key, value in payload_dict.items():
+            setattr(doctor, key, value)
+
+        db.add(doctor)
+        db.commit()
+        db.refresh(doctor)
+
+        return doctor
+    
+    @staticmethod
+    def delete_doctor(db: Session, doctor_id: int):
+        doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
+        
+        db.delete(doctor)
+        db.commit()
+
+        return None
+        
+        
 
 
 doctor_crud_service = DoctorCRUDServices()
