@@ -27,7 +27,7 @@ class Patient(Base):
     country = Column(String, nullable=False)
     hospital_card_id = Column(String, nullable=False, unique=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String, nullable=False)
+    password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
 
     appointments = relationship("Appointment", back_populates="patient")
@@ -56,7 +56,7 @@ class Doctor(Base):
     zip_code = Column(String, nullable=False)
     country = Column(String, nullable=False)
     is_available = Column(Boolean, nullable=False, default=True)
-    hashed_password = Column(String, nullable=False)
+    password = Column(String, nullable=False)
 
     appointments = relationship("Appointment", back_populates="doctor")
 
@@ -66,7 +66,7 @@ class Appointment(Base):
 
     id = Column(Integer, primary_key=True, index=True,
                 autoincrement=True, nullable=False)
-    diagnosis = Column(Text(255), nullable=False)
+    diagnosis = Column(Text, nullable=False)
     severity = Column(String(10), nullable=False)
     patient_id = Column(Integer, ForeignKey(
         "patients.id", ondelete="CASCADE"), nullable=False)

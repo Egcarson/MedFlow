@@ -1,14 +1,14 @@
 import re
 from sqlalchemy.orm import Session
-from crud.doctors import doctor_crud_service
-from crud.patients import patient_crud_service
+from app.crud.doctors import doctor_crud_service
+from app.crud.patients import patient_crud_service
+from app import schema
 
-
-# from passlib.context import CryptContext
+from passlib.context import CryptContext
 
 # # Define the password hashing context
 
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # def hash_password(password: str):
 #     return pwd_context.hash(password)
@@ -32,7 +32,7 @@ def get_user(db: Session, credential: str):
 def validate_password(password: str, first_name: str, last_name: str) -> str:
     if len(password) < 8:
         return "Password must be at least 8 characters long"
-    if password.lower() == first_name.lower() or password.lower() == last_name.lower() or password.lower() == (first_name + last_name).lower():
+    if first_name.lower() in password.lower() or last_name.lower() in password.lower():
         return "Password cannot be the same as your name"
     if not re.search(r'[A-Z]', password):
         return "Password must contain at least one uppercase letter"
@@ -45,3 +45,35 @@ def validate_password(password: str, first_name: str, last_name: str) -> str:
     if ' ' in password:
         return "Password must not contain spaces"
     return "Password is valid"
+
+def users_email(email: str, db: Session):
+    user = patient_crud_service.get_patient_by_email(db=db, email=email)
+    if not user:
+        user = doctor_crud_service.get_doctor_by_email(db=db, email=email)
+        return user
+    return user
+
+def users_id(id: int, db: Session):
+    user = patient_crud_service.get_patient_by_id(id, db)
+    if not user:
+        user = doctor_crud_service.get_doctor_by_id(id, db)
+        return user
+    return user
+
+def update_password(payload: schema.PasswordReset, db: Session):
+    user = users_email(payload.email, db)
+    if not user:
+        return False
+    
+    if payload.new_password == user.password:
+        return False
+    
+    if payload.new_password != payload.confirm_password:
+        return False
+    
+    hashed_password = pwd_context.hash(payload.new_password)
+    user.password = hashed_password
+
+    db.commit()
+    db.refresh(user)
+    return user

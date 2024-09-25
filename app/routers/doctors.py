@@ -1,5 +1,3 @@
-
-
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -9,16 +7,18 @@ from app.database import get_db
 from app.oauth2 import get_current_user
 
 
-doctor_router = APIRouter()
+router = APIRouter(
+    tags=['Doctors']
+)
 
 
-@doctor_router.get('/', status_code=200, response_model=List[schema.Doctor])
+@router.get('/doctors', status_code=200, response_model=List[schema.Doctor])
 async def get_doctors(db: Session = Depends(get_db), offset: int = 0, limit: int = 10):
     doctors = doctor_crud_service.get_all_doctors(db, offset, limit)
 
     return doctors
 
-@doctor_router.get('/specialization', status_code=200, response_model=List[schema.Doctor])
+@router.get('/doctors/specialization', status_code=200, response_model=List[schema.Doctor])
 async def get_doctor_by_specialization(specialization: str, db: Session = Depends(get_db), offset: int = 0, limit: int = 10):
     doctors = doctor_crud_service.get_doctor_by_specialization(db, specialization=specialization, offset=offset, limit=limit)
 
@@ -31,7 +31,7 @@ async def get_doctor_by_specialization(specialization: str, db: Session = Depend
     return doctors
 
 
-@doctor_router.get('/{doctor_id}', status_code=201, response_model=schema.Doctor)
+@router.get('/doctors/{doctor_id}', status_code=201, response_model=schema.Doctor)
 async def get_doctor_by_id(doctor_id: str, db: Session = Depends(get_db)):
     doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
 
@@ -40,7 +40,7 @@ async def get_doctor_by_id(doctor_id: str, db: Session = Depends(get_db)):
     
     return doctor
 
-@doctor_router.post('/{doctor_id}/change_availability', status_code=200)
+@router.post('/doctors/{doctor_id}/change_availability', status_code=200)
 async def change_availability_status(doctor_id: int, db: Session = Depends(get_db), current_user: schema.Doctor = Depends(get_current_user)):
     doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
     if not doctor:
@@ -55,7 +55,7 @@ async def change_availability_status(doctor_id: int, db: Session = Depends(get_d
 
 
 
-@doctor_router.put('/{doctor_id}', status_code=200, response_model=schema.Doctor)
+@router.put('/doctors/{doctor_id}', status_code=200, response_model=schema.Doctor)
 async def update_doctor(doctor_id: int, payload: schema.DoctorUpdate, db: Session = Depends(get_db), current_user: schema.Doctor = Depends(get_current_user)):
     doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
     if not doctor:
@@ -69,7 +69,7 @@ async def update_doctor(doctor_id: int, payload: schema.DoctorUpdate, db: Sessio
     return updated_doctor
 
 
-@doctor_router.delete('/{doctor_id}', status_code=200)
+@router.delete('/doctors/{doctor_id}', status_code=200)
 async def delete_doctor(doctor_id: int, db: Session = Depends(get_db), current_user: schema.Doctor = Depends(get_current_user)):
     doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
     if not doctor:

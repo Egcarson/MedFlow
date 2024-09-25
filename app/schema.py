@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 from typing import List
 
@@ -16,7 +16,7 @@ class PatientBase(BaseModel):
     last_name: str = "Doe"
     email: EmailStr
     phone_number: str
-    date_of_birth: datetime
+    date_of_birth: date
     gender: str
     age: Optional[int] = None
     address_line1: str
@@ -25,11 +25,11 @@ class PatientBase(BaseModel):
     state: str = "Lagos"
     zip_code: str
     country: str = "Nigeria"
-    hospital_card_id: str = "MEDFLOW/PAT/24/001"
     
 
 class PatientCreate(PatientBase):
     password: str
+    hospital_card_id: str = "MEDFLOW/PAT/24/001"
 
 class PatientUpdate(PatientBase):
     pass
@@ -45,10 +45,10 @@ class Patient(PatientBase):
 class DoctorBase(BaseModel):
     title: str = "Dr."
     first_name: str = "Henry"
-    last_name: str = "Henry"
+    last_name: str = "Ojeh"
     email: EmailStr
     phone_number: str
-    date_of_birth: datetime
+    date_of_birth: date
     gender: str
     age: Optional[int] = None
     specialization: str = "Surgeon"
@@ -99,13 +99,22 @@ class Appointment(AppointmentBase):
 
 # medical record schema definition
 class EMRBase(BaseModel):
-    hospital_id: int
-    appointments: List[Appointment]
+    patient_id: int
     
+     
 
 class EMRCreate(EMRBase):
-    appointments: List[Appointment] = None
+    pass
 
 class EMR(EMRBase):
     id: int
     appointments: List[Appointment]
+
+    class Config:
+        from_attributes = True
+
+
+class PasswordReset(BaseModel):
+    email: EmailStr
+    new_password: str
+    confirm_password: str
