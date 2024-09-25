@@ -21,6 +21,7 @@ class PatientCRUDServices:
     def get_patients(offset: int = 0, limit: int = 10, search: Optional[str] = "", db: Session = Depends()) -> models.Patient:
         return db.query(models.Patient).filter((models.Patient.hospital_card_id.contains(search.upper())) | (models.Patient.last_name.contains(search.title()))).offset(offset).limit(limit).all() # the filtering will enable the admin retrieve patients by a specific year or pattern using the card_id (e.g MEDFLOW/PAT/24/001 -> MEDFLOW/PAT/24 will retrieve only a specific year 2024 or MEDFLOW/PAT/23 etc...) or by last name
     
+    
     @staticmethod
     def get_patient_by_email(db: Session, email: str):
         return db.query(models.Patient).filter(models.Patient.email == email).first()
@@ -49,7 +50,7 @@ class PatientCRUDServices:
     
     @staticmethod
     def delete_patient(id: int, db: Session):
-        patient = PatientCRUDServices.get_patient_by_id(id, db)
+        patient = patient_crud_service.get_patient_by_id(id, db)
         if not patient:
             return None
 

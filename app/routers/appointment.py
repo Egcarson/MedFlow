@@ -9,7 +9,7 @@ router = APIRouter(
     tags=['Appointments']
     )
 
-@router.post('/appoointments', status_code=status.HTTP_201_CREATED, response_model=schema.Appointment)
+@router.post('/appointments', status_code=status.HTTP_201_CREATED, response_model=schema.Appointment)
 def create_appointment(payload: schema.AppointmentCreate, patient_id: int, doctor_id: int, db: Session = Depends(database.get_db), current_user: models.Patient = Depends(oauth2.get_current_user)):
     patient = pat_crud.get_patient_by_id(patient_id, db)
     if not patient:
@@ -76,8 +76,8 @@ def update_appointment(appointment_id: int, payload: schema.AppointmentUpdate, d
         "message": "Appointment updated successfully",
         "detail": appointment}
 
-@router.delete('/appointments/{appointment_id}', status_code=status.HTTP_202_ACCEPTED)
-def delete_appointment(appointment_id: int, db: Session = Depends(database.get_db), current_user: models.Patient = Depends(oauth2.get_current_user)):
+@router.put('/appointments/cancel_appointment/{appointment_id}', status_code=status.HTTP_202_ACCEPTED)
+def cancel_appointment(appointment_id: int, db: Session = Depends(database.get_db), current_user: models.Patient = Depends(oauth2.get_current_user)):
     appointment = apt_crud.get_appointment_by_id(appointment_id, db)
     if not appointment:
         raise HTTPException(
@@ -93,4 +93,4 @@ def delete_appointment(appointment_id: int, db: Session = Depends(database.get_d
         )
     
     apt_crud.cancel_appointment(appointment_id, db)
-    return {"message": "Appointment deleted successfully"}
+    return {"message": "Appointment cancelled successfully"}

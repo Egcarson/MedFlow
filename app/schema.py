@@ -98,10 +98,20 @@ class Appointment(AppointmentBase):
 
 
 # medical record schema definition
-class EMR(BaseModel):
-    id: int
+class EMRBase(BaseModel):
     patient_id: int
+    
+     
+
+class EMRCreate(EMRBase):
+    pass
+
+class EMR(EMRBase):
+    id: int
     appointments: List[Appointment]
+
+    class Config:
+        from_attributes = True
 
 
 class PasswordReset(BaseModel):
