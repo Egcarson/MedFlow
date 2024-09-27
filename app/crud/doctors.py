@@ -55,10 +55,11 @@ class DoctorCRUDServices:
         doctor = doctor_crud_service.get_doctor_by_id(db, doctor_id=doctor_id)
         if not doctor:
             return None
-        if doctor.is_available:
-            doctor.is_available = False
-        else:
-            doctor.is_available = True
+        
+        doctor.is_available = not doctor.is_available
+
+        db.commit()
+        db.refresh(doctor)
         
         return doctor
     

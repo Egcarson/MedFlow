@@ -74,7 +74,6 @@ class Doctor(DoctorBase):
 
 # Appointment schema definition
 class AppointmentBase(BaseModel):
-    id: int
     diagnosis: str
     severity: str
     appointment_date: datetime
@@ -90,6 +89,16 @@ class Appointment(AppointmentBase):
     patient_id: int
     doctor_id: int
     emr_id: Optional[int] = None
+    status: AppointmentStatus = AppointmentStatus.PENDING
+
+    class Config:
+        from_attributes = True
+
+class AppointmentResponse(BaseModel):
+    id: int
+    diagnosis: str
+    severity: str
+    appointment_date: datetime
     status: AppointmentStatus = AppointmentStatus.PENDING
 
     class Config:
@@ -113,8 +122,16 @@ class EMR(EMRBase):
     class Config:
         from_attributes = True
 
+class EMRResponse(BaseModel):
+    id: int
+    patient_id: int
+    appointments: List[Appointment]
+
 
 class PasswordReset(BaseModel):
     email: EmailStr
     new_password: str
     confirm_password: str
+
+class AppointmentStatusSwitch(BaseModel):
+    status: AppointmentStatus = AppointmentStatus.PENDING

@@ -22,9 +22,12 @@ def get_appointment(offset: int, limit: int, db: Session) -> models.Appointment:
 def get_appointments_by_patient_id(patient_id: int, db: Session) -> models.Appointment:
     return db.query(models.Appointment).filter(models.Appointment.patient_id == patient_id).all()
 
+def status_validation(patient_id: int, appointment_id: int, db: Session) -> models.Appointment:
+    return db.query(models.Appointment).filter(models.Appointment.id == appointment_id, models.Appointment.patient_id == patient_id).first()
+
 
 def get_uncompleted_appointments(db: Session, patient_id: int):
-    return db.query(models.Appointment).filter(models.Appointment.patient_id == patient_id, or_(models.AppointmentStatus == schema.AppointmentStatus.PENDING, models.AppointmentStatus == schema.AppointmentStatus.IN_PROGRESS)).all()
+    return db.query(models.Appointment).filter(models.Appointment.patient_id == patient_id, or_(models.Appointment.status == schema.AppointmentStatus.PENDING, models.Appointment.status == schema.AppointmentStatus.IN_PROGRESS)).all()
 
 def get_appointment_by_id(appointment_id: int, db: Session) -> models.Appointment:
     return db.query(models.Appointment).filter(models.Appointment.id == appointment_id).first()
@@ -51,5 +54,23 @@ def cancel_appointment(appointment_id: int, db: Session) -> models.Appointment:
         appointment.status = schema.AppointmentStatus.CANCELLED
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Appointment in-progress or completed cannot be cancelled')
+    
+    db.commit()
+    db.refresh(appointment)
+    
+    return appointment
+
+def check_pending_appointment(patient_id: int, db: Session):
+    return db.query(models.Appointment).filter(models.Appointment.patient_id == patient_id, models.Appointment.status == schema.AppointmentStatus.PENDING).first()
+
+def switch_status(patient_id: int, appointment_id: int, payload: schema.AppointmentStatusSwitch, db: Session) -> models.Appointment:
+    appointment = status_validation(patient_id, appointment_id, db)
+    if not appointment:
+        return None
+    
+    appointment.status = payload.status
+    
+    db.commit()
+    db.refresh(appointment)
     
     return appointment

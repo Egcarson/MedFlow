@@ -8,6 +8,7 @@ from app.database import get_db
 from app import schema, models,oauth2
 from app.crud.patients import patient_crud_service
 from app.crud.doctors import doctor_crud_service
+from app.crud import appointment as apt_crud
 from app.utils import validate_password, users_email, update_password, users_id
 
 auth_router = APIRouter()
@@ -112,3 +113,37 @@ def password_reset(payload: schema.PasswordReset, db: Session = Depends(get_db),
     
     update_password(payload, db)
     return {"details": "Password has been changed successfully!"}
+
+@auth_router.put('/admin/apppointment_status', status_code=status.HTTP_202_ACCEPTED)
+def appointment_status_switch(patient_id: int, appointment_id: int, payload: schema.AppointmentStatusSwitch, db: Session = Depends(get_db), current_user: models.Doctor = Depends(oauth2.get_current_user)):
+    
+    appointment = apt_crud.status_validation(patient_id, appointment_id, db)
+    if not appointment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Patient does not exist or no appointment record found for the specified patient."
+        )
+    
+    doctor = doctor_crud_service.get_doctor_by_id(db=db, doctor_id=current_user.id)
+
+    if not doctor:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to perform this action!"
+        )
+    
+    if appointment.status == schema.AppointmentStatus.COMPLETED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Appointment has already been completed! Request aborted."
+        )
+    
+    if appointment.status == schema.AppointmentStatus.CANCELLED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Appointment has already been cancelled! Request aborted."
+        )
+    
+    apt_crud.switch_status(patient_id, appointment_id, payload, db)
+    
+    return {"message": "Patient appointment status has been updated successfully"}

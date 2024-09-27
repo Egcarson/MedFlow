@@ -25,22 +25,29 @@ class EmrCRUDServices:
 
 
     @staticmethod
-    def get_patient_EMR(db: Session, patient_id: str):
-        patient = patient_crud_service.get_patient_by_id(db, patient_id)
-        if not patient:
-            return None
-        return db.query(models.EMR).filter(patient_id == patient_id).first()
-        
+    def get_patient_EMR(patient_id: int, db: Session):
+        return db.query(models.EMR).filter(models.EMR.patient_id == patient_id).all()
+    
+    @staticmethod
+    def get_patient_EMR2(patient_id: int, emr_id: int, db: Session):
+        return db.query(models.EMR).filter(models.EMR.id == emr_id, models.EMR.patient_id == patient_id).first() # single validation
 
 
     @staticmethod
-    def delete_patient_EMR(db: Session, patient_id: int):
-        Emr = emr_crud_service.get_patient_EMR(db, patient_id)
+    def delete_patient_EMR(patient_id: int, emr_id: int, db: Session):
+        emr = emr_crud_service.get_patient_EMR2(patient_id, emr_id, db)
 
-        db.delete(Emr)
+        if not emr:
+            return None
+
+        db.delete(emr)
         db.commit()
-
-        return None
+        
+        return emr
+    
+    @staticmethod
+    def validate_patient_doctor(patient_id: int, doctor_id: int, db: Session):
+        return db.query(models.Appointment).filter(models.Appointment.patient_id == patient_id, models.Appointment.doctor_id == doctor_id).all()
 
 
 emr_crud_service = EmrCRUDServices()

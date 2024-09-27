@@ -49,10 +49,9 @@ async def change_availability_status(doctor_id: int, db: Session = Depends(get_d
     if current_user.id != doctor_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authorized to make changes')
     
-    doctor = doctor_crud_service.change_doctor_availability_status(db, doctor_id=doctor_id)
+    doctor_crud_service.change_doctor_availability_status(db, doctor_id=doctor_id)
 
-    return doctor
-
+    return {"Status updated successfully!"}
 
 
 @router.put('/doctors/{doctor_id}', status_code=200, response_model=schema.Doctor)

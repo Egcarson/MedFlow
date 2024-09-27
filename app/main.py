@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.database import engine
-from app.routers import auth, patients, emr, doctors
+from app.routers import auth, patients, emr, doctors, appointment
 
 # models.Base.metadata.create_all(bind=engine)
 
@@ -14,6 +14,7 @@ app.include_router(
 app.include_router(patients.router)
 app.include_router(emr.router)
 app.include_router(doctors.router)
+app.include_router(appointment.router)
 
 @app.get('/')
 def root():
