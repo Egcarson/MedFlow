@@ -5,7 +5,7 @@ from app import models
 from app.database import engine
 from app.routers import auth, patients, emr, doctors, appointment
 
-# models.Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -18,4 +18,4 @@ app.include_router(appointment.router)
 
 @app.get('/')
 def root():
-    return {'message': 'Hello, World!'}
+    return {'message': 'Medical API!'}
