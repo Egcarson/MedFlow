@@ -79,6 +79,7 @@ class AppointmentBase(BaseModel):
     appointment_date: datetime
 
 class AppointmentCreate(AppointmentBase):
+    doctor_id: int
     pass
 
 class AppointmentUpdate(AppointmentBase):
@@ -98,6 +99,8 @@ class AppointmentResponse(BaseModel):
     id: int
     diagnosis: str
     severity: str
+    patient: Patient
+    doctor: Doctor
     appointment_date: datetime
     status: AppointmentStatus = AppointmentStatus.PENDING
 

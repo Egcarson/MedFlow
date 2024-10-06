@@ -11,7 +11,7 @@ router = APIRouter(
     )
 
 @router.post('/appointments', status_code=status.HTTP_201_CREATED, response_model=schema.AppointmentResponse)
-def create_appointment(payload: schema.AppointmentCreate, patient_id: int, doctor_id: int, db: Session = Depends(database.get_db), current_user: models.Patient = Depends(oauth2.get_current_user)):
+def create_appointment(payload: schema.AppointmentCreate, patient_id: int, db: Session = Depends(database.get_db), current_user: models.Patient = Depends(oauth2.get_current_user)):
     patient = pat_crud.get_patient_by_id(patient_id, db)
     if not patient:
         raise HTTPException(
@@ -35,13 +35,13 @@ def create_appointment(payload: schema.AppointmentCreate, patient_id: int, docto
         )
     
     #updating this session with doctor id validation
-    doctor = doc_crud.get_doctor_by_id(db, doctor_id)
+    doctor = doc_crud.get_doctor_by_id(db, payload.doctor_id)
 
     # validating availability of doctor in the database
     if not doctor:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="The doctor with id '%s' does not exist" % doctor_id
+            detail="The doctor with id '%s' does not exist" % payload.doctor_id
         )
 
     # validate doctor status
@@ -51,7 +51,7 @@ def create_appointment(payload: schema.AppointmentCreate, patient_id: int, docto
             detail="The doctor is not available at the moment."
         )
 
-    appointment = apt_crud.create_appointment(payload, patient_id, doctor_id, db)
+    appointment = apt_crud.create_appointment(payload, patient_id, db)
 
     doctor.is_available = False
     db.commit()

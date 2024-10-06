@@ -9,8 +9,8 @@ from app import models, schema
 # update an appointment
 # cancel/delete an appointment
 
-def create_appointment(payload: schema.AppointmentCreate, patient_id: int, doctor_id: int, db: Session) -> models.Appointment:
-    appointment = models.Appointment(**payload.model_dump(), patient_id=patient_id, doctor_id=doctor_id)
+def create_appointment(payload: schema.AppointmentCreate, patient_id: int, db: Session) -> models.Appointment:
+    appointment = models.Appointment(**payload.model_dump(), patient_id=patient_id)
     db.add(appointment)
     db.commit()
     db.refresh(appointment)
